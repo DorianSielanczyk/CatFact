@@ -1,0 +1,51 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+artifacts/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+
+## Rider / VS Code
+.idea/
+.vscode/
+*.DotSettings.user
+
+## Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+coverage*.json
+coverage*.xml
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!packages/build/
+
+## Publish
+publish/
+*.[Pp]ublish.xml
+*.pubxml
+*.pubxml.user
+
+## Secrets & local config
+appsettings.Local.json
+*.env
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db

@@ -10,5 +10,5 @@ app.ConfigureHttpRequestPipeline();
 
 app.Run();
 
-// This partial class is needed for the integration tests 
+// Integration tests 
 public partial class Program { }

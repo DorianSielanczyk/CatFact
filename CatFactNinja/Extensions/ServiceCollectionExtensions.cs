@@ -1,4 +1,6 @@
 ﻿using CatFact.API.Client;
+using CatFact.API.Models;
+using CatFact.API.Services;
 
 namespace CatFact.API.Extensions
 {
@@ -16,6 +18,10 @@ namespace CatFact.API.Extensions
             {
                 client.BaseAddress = new Uri(catFactApiUrl!);
             });
+
+            services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
+
+            services.AddScoped<IFactResponseService, FactResponseService>();
 
             return services;
         }

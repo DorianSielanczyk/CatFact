@@ -1,4 +1,5 @@
 ﻿using CatFact.API.Client;
+using CatFact.API.Exceptions;
 using CatFact.API.Models;
 using CatFact.API.Services;
 
@@ -11,6 +12,9 @@ namespace CatFact.API.Extensions
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
 
             var catFactApiUrl = configuration["CatFactApi:BaseUrl"];
 

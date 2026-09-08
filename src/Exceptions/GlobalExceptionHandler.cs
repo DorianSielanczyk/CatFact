@@ -20,6 +20,9 @@ namespace CatFact.API.Exceptions
                 UnauthorizedAccessException or IOException =>
                     (StatusCodes.Status500InternalServerError, "Wystąpił błąd podczas zapisu danych na serwerze."),
 
+                System.Text.Json.JsonException =>
+                    (StatusCodes.Status502BadGateway, "Otrzymano nieprawidłową odpowiedź z zewnętrznego API."),
+
                 TaskCanceledException or OperationCanceledException =>
                     (499, "Żądanie zostało anulowane."),
 

@@ -19,15 +19,13 @@ namespace CatFact.API.Extensions
 
             services.AddFactResponseClient(configuration);
 
+            services.AddOptions<FactApiOptions>()
+                .BindConfiguration(FactApiOptions.SectionName)
+                .ValidateDataAnnotations() 
+                .ValidateOnStart();
+
             services.AddHealthChecks()
                .AddCheck<FactApiHealthCheck>("catfact-api", tags: ["external"]);
-
-            var catFactApiUrl = configuration["CatFactApi:BaseUrl"];
-
-            services.AddHttpClient<IFactResponseClient, FactResponseClient>(client =>
-            {
-                client.BaseAddress = new Uri(catFactApiUrl!);
-            });
 
             services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
 

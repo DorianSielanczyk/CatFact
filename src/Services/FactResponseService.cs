@@ -1,13 +1,13 @@
-﻿using CatFact.API.Client;
+using CatFact.API.Client;
 using CatFact.API.DTOs;
 using CatFact.API.Models;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 
 namespace CatFact.API.Services
 {
     public class FactResponseService(IFactResponseClient factResponseClient,
-        IOptions<FileStorageOptions> fileStorageOptions) : IFactResponseService
+        IOptions<FileStorageOptions> fileStorageOptions,
+        IWebHostEnvironment environment) : IFactResponseService
     {
         public async Task<FactResponse> SaveToFileFactResponseAsync(CancellationToken cancellationToken = default)
         {
@@ -24,12 +24,23 @@ namespace CatFact.API.Services
 
         private string EnsureDirectoryAndGetFilePath()
         {
-            var parentDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName;
-            var directoryPath = Path.Combine(parentDirectory!, fileStorageOptions.Value.DirectoryName);
+            var options = fileStorageOptions.Value;
+
+            if (string.IsNullOrWhiteSpace(options.DirectoryName))
+            {
+                throw new InvalidOperationException("Brakuje nazwy katalogu.");
+            }
+
+            if (string.IsNullOrWhiteSpace(options.FileName))
+            {
+                throw new InvalidOperationException("Brakuje nazwy pliku.");
+            }
+
+            var directoryPath = Path.GetFullPath(Path.Combine(environment.ContentRootPath, options.DirectoryName));
 
             Directory.CreateDirectory(directoryPath);
 
-            return Path.Combine(directoryPath, fileStorageOptions.Value.FileName);
+            return Path.Combine(directoryPath, options.FileName);
         }
     }
 }

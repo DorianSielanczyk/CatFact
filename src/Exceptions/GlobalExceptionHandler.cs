@@ -13,6 +13,13 @@ namespace CatFact.API.Exceptions
         Exception exception,
         CancellationToken cancellationToken)
         {
+            if (exception is OperationCanceledException)
+            {
+                logger.LogInformation("Żądanie zostało anulowane przez klienta (Client Disconnected).");
+
+                return true;
+            }
+
             logger.LogError(exception, "Wystąpił nieoczekiwany błąd: {Message}", exception.Message);
 
             var (statusCode, title) = exception switch
@@ -29,9 +36,6 @@ namespace CatFact.API.Exceptions
                 UnauthorizedAccessException or IOException =>
                     (StatusCodes.Status500InternalServerError, "Wystąpił błąd podczas zapisu danych na serwerze."),
 
-                TaskCanceledException or OperationCanceledException =>
-                    (499, "Żądanie zostało anulowane."),
-
                 ArgumentNullException or ArgumentException =>
                     (StatusCodes.Status400BadRequest, "Nieprawidłowa konfiguracja lub parametry żądania."),
 
@@ -47,7 +51,10 @@ namespace CatFact.API.Exceptions
 
             httpContext.Response.StatusCode = statusCode;
 
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            if (!httpContext.Response.HasStarted)
+            {
+                await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            }
 
             return true;
         }

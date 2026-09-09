@@ -40,6 +40,7 @@ namespace CatFact.API.Extensions
                         .HandleResult(response => (int)response.StatusCode >= 500),
                          OnRetry = args =>
                          {
+                             // Napisane aby sprawdzić w konsoli retriesy, na produkcji powinno się zrobić z tego logi 
                              Console.WriteLine($"[RETRY] Próba {args.AttemptNumber + 1}, powód: {args.Outcome.Exception?.Message ?? args.Outcome.Result?.StatusCode.ToString()}");
                              return ValueTask.CompletedTask;
                          }

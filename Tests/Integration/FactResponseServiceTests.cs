@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -13,6 +14,7 @@ public class FactResponseServiceTests : IDisposable
     private readonly string _testDirectoryName = "TestResponses_" + Guid.NewGuid();
     private readonly string _testFileName = "test_fact.txt";
     private readonly Mock<IFactResponseClient> _mockClient = new();
+    private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
     private readonly FactResponseService _service;
     private readonly string _expectedDirPath;
 
@@ -24,8 +26,11 @@ public class FactResponseServiceTests : IDisposable
             FileName = _testFileName
         });
 
-        _service = new FactResponseService(_mockClient.Object, options);
-        _expectedDirPath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())!.FullName, _testDirectoryName);
+        _mockEnvironment.Setup(e => e.ContentRootPath)
+            .Returns(Directory.GetParent(Directory.GetCurrentDirectory())!.FullName);
+
+        _service = new FactResponseService(_mockClient.Object, options, _mockEnvironment.Object);
+        _expectedDirPath = Path.Combine(_mockEnvironment.Object.ContentRootPath, _testDirectoryName);
     }
 
     [Fact]
@@ -73,7 +78,7 @@ public class FactResponseServiceTests : IDisposable
             FileName = "test.txt"
         });
 
-        var serviceWithBadConfig = new FactResponseService(_mockClient.Object, badOptions);
+        var serviceWithBadConfig = new FactResponseService(_mockClient.Object, badOptions, _mockEnvironment.Object);
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<Exception>(() => serviceWithBadConfig.SaveToFileFactResponseAsync());

@@ -9,6 +9,7 @@ namespace CatFact.API.Services
         IOptions<FileStorageOptions> fileStorageOptions,
         IWebHostEnvironment environment) : IFactResponseService
     {
+        private static readonly SemaphoreSlim FileWriteLock = new(1, 1);
         public async Task<FactResponse> SaveToFileFactResponseAsync(CancellationToken cancellationToken = default)
         {
             var factResponse = await factResponseClient.GetFactResponseAsync(cancellationToken);
@@ -17,7 +18,16 @@ namespace CatFact.API.Services
 
             var content = $"{factResponse.Fact}, {factResponse.Length}";
 
-            await File.AppendAllTextAsync(filePath, $"{content}{Environment.NewLine}", cancellationToken);
+            await FileWriteLock.WaitAsync(cancellationToken);
+            try
+            {
+                await File.AppendAllTextAsync(filePath, $"{content}{Environment.NewLine}", cancellationToken);
+            }
+            finally
+            {
+                FileWriteLock.Release();
+            }
+
 
             return factResponse;
         }

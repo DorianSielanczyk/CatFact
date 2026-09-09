@@ -1,5 +1,6 @@
 using CatFact.API.Client;
 using CatFact.API.Exceptions;
+using CatFact.API.HealthChecks;
 using CatFact.API.Models;
 using CatFact.API.Services;
 
@@ -19,7 +20,7 @@ namespace CatFact.API.Extensions
             services.AddFactResponseClient(configuration);
 
             services.AddHealthChecks()
-    .AddCheck<FactApiHealthCheck>("catfact-api", tags: ["external"]);
+               .AddCheck<FactApiHealthCheck>("catfact-api", tags: ["external"]);
 
             var catFactApiUrl = configuration["CatFactApi:BaseUrl"];
 

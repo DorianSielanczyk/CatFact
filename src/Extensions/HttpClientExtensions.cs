@@ -37,7 +37,12 @@ namespace CatFact.API.Extensions
                     ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
                         .Handle<HttpRequestException>()
                         .Handle<TimeoutRejectedException>()
-                        .HandleResult(response => (int)response.StatusCode >= 500)
+                        .HandleResult(response => (int)response.StatusCode >= 500),
+                         OnRetry = args =>
+                         {
+                             Console.WriteLine($"[RETRY] Próba {args.AttemptNumber + 1}, powód: {args.Outcome.Exception?.Message ?? args.Outcome.Result?.StatusCode.ToString()}");
+                             return ValueTask.CompletedTask;
+                         }
                 });
 
                 builder.AddTimeout(TimeSpan.FromSeconds(options.TimeoutSeconds));

@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
+using System.Text.Json;
 
 namespace CatFact.API.Exceptions
 {
@@ -14,14 +17,17 @@ namespace CatFact.API.Exceptions
 
             var (statusCode, title) = exception switch
             {
-                HttpRequestException or TimeoutException =>
-                    (StatusCodes.Status503ServiceUnavailable, "Zewnętrzne API jest chwilowo niedostępne."),
+                HttpRequestException or TimeoutException or TimeoutRejectedException =>
+                   (StatusCodes.Status503ServiceUnavailable, "Zewnętrzne API jest chwilowo niedostępne."),
+
+                BrokenCircuitException =>
+                    (StatusCodes.Status503ServiceUnavailable, "Zewnętrzne API jest tymczasowo wyłączone z obsługi (zbyt wiele błędów)."),
+
+                JsonException =>
+                    (StatusCodes.Status502BadGateway, "Otrzymano nieprawidłową odpowiedź z zewnętrznego API."),
 
                 UnauthorizedAccessException or IOException =>
                     (StatusCodes.Status500InternalServerError, "Wystąpił błąd podczas zapisu danych na serwerze."),
-
-                System.Text.Json.JsonException =>
-                    (StatusCodes.Status502BadGateway, "Otrzymano nieprawidłową odpowiedź z zewnętrznego API."),
 
                 TaskCanceledException or OperationCanceledException =>
                     (499, "Żądanie zostało anulowane."),

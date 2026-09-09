@@ -1,4 +1,4 @@
-﻿namespace CatFact.API.Extensions
+namespace CatFact.API.Extensions
 {
     public static class WebApplicationExtensions
     {
@@ -10,6 +10,7 @@
                 app.UseSwaggerUI();
             }
 
+            app.MapHealthChecks("/health");
             app.UseExceptionHandler();
             app.UseHttpsRedirection();
             app.UseAuthorization();

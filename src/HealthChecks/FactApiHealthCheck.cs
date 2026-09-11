@@ -12,15 +12,15 @@ namespace CatFact.API.HealthChecks
             try
             {
                 await factClient.GetFactResponseAsync(cancellationToken);
-                return HealthCheckResult.Healthy("CatFact API is responding correctly.");
+                return HealthCheckResult.Healthy("CatFact API odpowiada poprawnie.");
             }
             catch (HttpRequestException ex)
             {
-                return HealthCheckResult.Degraded($"CatFact API network error: {ex.Message}");
+                return HealthCheckResult.Degraded($"CatFact API błąd sieci: {ex.Message}");
             }
             catch (Exception ex)
             {
-                return HealthCheckResult.Unhealthy("Failed to connect to CatFact API.", ex);
+                return HealthCheckResult.Unhealthy("Nie udało się połączyć z CatFact API.", ex);
             }
         }
     }

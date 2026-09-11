@@ -1,6 +1,7 @@
 using CatFact.API.Clients;
 using CatFact.API.Exceptions;
 using CatFact.API.HealthChecks;
+using CatFact.API.Infrastructure;
 using CatFact.API.Models;
 using CatFact.API.Services;
 
@@ -25,6 +26,8 @@ namespace CatFact.API.Extensions
             services.AddTransient<CachedFactApiHealthCheck>();
 
             services.AddApplicationRateLimiting();
+
+            services.AddSingleton<FileWriteLockManager>();
 
             services.AddHealthChecks()
                .AddCheck<CachedFactApiHealthCheck>("catfact-api", tags: ["external"]);

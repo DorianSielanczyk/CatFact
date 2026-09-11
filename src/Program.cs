@@ -10,7 +10,5 @@ app.ConfigureHttpRequestPipeline();
 
 app.Run();
 
-// Integration tests 
-public partial class Program { }
 
 

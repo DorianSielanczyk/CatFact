@@ -10,12 +10,12 @@ namespace CatFact.API.Extensions
                 app.UseSwaggerUI();
             }
 
-            app.MapHealthChecks("/health");
             app.UseExceptionHandler();
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.UseRateLimiter();
             app.MapControllers();
+            app.MapHealthChecks("/health");
 
             return app;
         }

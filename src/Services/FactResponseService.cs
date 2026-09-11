@@ -1,7 +1,7 @@
 using CatFact.API.Clients;
 using CatFact.API.DTOs;
+using CatFact.API.Infrastructure;
 using CatFact.API.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace CatFact.API.Services
@@ -9,15 +9,13 @@ namespace CatFact.API.Services
     public class FactResponseService(
         IFactResponseClient factResponseClient,
         IOptions<FileStorageOptions> fileStorageOptions,
-        IWebHostEnvironment environment) : IFactResponseService
+        IWebHostEnvironment environment,
+        FileWriteLockManager lockManager) : IFactResponseService 
     {
-        private static readonly SemaphoreSlim FileWriteLock = new(1, 1);
-        private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
 
         public async Task<FactResponse> SaveToFileFactResponseAsync(CancellationToken cancellationToken = default)
         {
             var factResponse = await factResponseClient.GetFactResponseAsync(cancellationToken);
-
             var contentToAppend = FormatContent(factResponse);
 
             await WriteContentSafelyAsync(contentToAppend, cancellationToken);
@@ -36,15 +34,15 @@ namespace CatFact.API.Services
             var directoryPath = EnsureAndGetDirectoryPath(options.DirectoryName);
             long newContentSize = System.Text.Encoding.UTF8.GetByteCount(content);
 
-            await FileWriteLock.WaitAsync(cancellationToken);
+            await lockManager.Lock.WaitAsync(cancellationToken);
             try
             {
-                var targetFilePath = GetAvailableFilePath(directoryPath, options.FileName, newContentSize);
+                var targetFilePath = GetAvailableFilePath(directoryPath, options, newContentSize);
                 await File.AppendAllTextAsync(targetFilePath, content, cancellationToken);
             }
             finally
             {
-                FileWriteLock.Release();
+                lockManager.Lock.Release();
             }
         }
 
@@ -64,16 +62,16 @@ namespace CatFact.API.Services
             return directoryPath;
         }
 
-        private string GetAvailableFilePath(string directoryPath, string baseFileName, long newContentSize)
+        private string GetAvailableFilePath(string directoryPath, FileStorageOptions options, long newContentSize)
         {
-            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(baseFileName);
-            var extension = Path.GetExtension(baseFileName);
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(options.FileName);
+            var extension = Path.GetExtension(options.FileName);
             int fileIndex = 0;
 
             while (true)
             {
                 var currentFileName = fileIndex == 0
-                    ? baseFileName
+                    ? options.FileName
                     : $"{fileNameWithoutExt}_{fileIndex}{extension}";
 
                 var filePath = Path.Combine(directoryPath, currentFileName);
@@ -81,7 +79,7 @@ namespace CatFact.API.Services
 
                 long currentSize = fileInfo.Exists ? fileInfo.Length : 0;
 
-                if (currentSize + newContentSize <= MaxFileSizeBytes)
+                if (currentSize + newContentSize <= options.MaxFileSizeBytes)
                 {
                     return filePath;
                 }

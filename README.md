@@ -12,7 +12,7 @@
 
 ### `POST /api/FactResponse`
 Fetches a random cat fact from the external API, appends it (along with its length) to a local text file located in the `Responses/` directory, and returns the fetched fact.
-*   **Rate Limit:** 3 requests per 10 seconds.
+*   **Rate Limit:** 5 requests per 10 seconds.
 *   **File Limit:** Will throw a handled exception if the local file exceeds 5MB.
 
 ## 🛠️ Getting Started

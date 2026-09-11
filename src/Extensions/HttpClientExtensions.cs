@@ -1,4 +1,4 @@
-using CatFact.API.Client;
+using CatFact.API.Clients;
 using CatFact.API.Models;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;

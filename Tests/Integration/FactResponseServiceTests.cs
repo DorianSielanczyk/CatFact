@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using CatFact.API.Services;
-using CatFact.API.Client;
+using CatFact.API.Clients;
 using CatFact.API.DTOs;
 using CatFact.API.Models;
 

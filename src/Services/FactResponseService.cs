@@ -1,4 +1,4 @@
-using CatFact.API.Client;
+using CatFact.API.Clients;
 using CatFact.API.DTOs;
 using CatFact.API.Models;
 using Microsoft.Extensions.Options;
@@ -10,24 +10,33 @@ namespace CatFact.API.Services
         IWebHostEnvironment environment) : IFactResponseService
     {
         private static readonly SemaphoreSlim FileWriteLock = new(1, 1);
-        public async Task<FactResponse> SaveToFileFactResponseAsync(CancellationToken cancellationToken = default)
+        private const long MaxFileSizeBytes = 5 * 1024 * 1024;
+       public async Task<FactResponse> SaveToFileFactResponseAsync(CancellationToken cancellationToken = default)
         {
             var factResponse = await factResponseClient.GetFactResponseAsync(cancellationToken);
 
             var filePath = EnsureDirectoryAndGetFilePath();
-
-            var content = $"{factResponse.Fact}, {factResponse.Length}";
+            var contentToAppend = $"{factResponse.Fact}, {factResponse.Length}{Environment.NewLine}";
 
             await FileWriteLock.WaitAsync(cancellationToken);
             try
             {
-                await File.AppendAllTextAsync(filePath, $"{content}{Environment.NewLine}", cancellationToken);
+                var fileInfo = new FileInfo(filePath);
+                long currentSize = fileInfo.Exists ? fileInfo.Length : 0;
+                
+                long newContentSize = System.Text.Encoding.UTF8.GetByteCount(contentToAppend);
+
+                if (currentSize + newContentSize > MaxFileSizeBytes)
+                {
+                    throw new InvalidOperationException("File size limit of 5 MB exceeded.");
+                }
+
+                await File.AppendAllTextAsync(filePath, contentToAppend, cancellationToken);
             }
             finally
             {
                 FileWriteLock.Release();
             }
-
 
             return factResponse;
         }

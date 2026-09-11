@@ -14,6 +14,7 @@ namespace CatFact.API.Extensions
             app.UseExceptionHandler();
             app.UseHttpsRedirection();
             app.UseAuthorization();
+            app.UseRateLimiter();
             app.MapControllers();
 
             return app;

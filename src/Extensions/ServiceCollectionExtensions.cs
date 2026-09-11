@@ -1,4 +1,4 @@
-using CatFact.API.Client;
+using CatFact.API.Clients;
 using CatFact.API.Exceptions;
 using CatFact.API.HealthChecks;
 using CatFact.API.Models;
@@ -19,13 +19,15 @@ namespace CatFact.API.Extensions
 
             services.AddFactResponseClient(configuration);
 
-            services.AddOptions<FactApiOptions>()
-                .BindConfiguration(FactApiOptions.SectionName)
-                .ValidateDataAnnotations() 
-                .ValidateOnStart();
+            services.AddMemoryCache();
+
+            services.AddTransient<FactApiHealthCheck>();
+            services.AddTransient<CachedFactApiHealthCheck>();
+
+            services.AddApplicationRateLimiting();
 
             services.AddHealthChecks()
-               .AddCheck<FactApiHealthCheck>("catfact-api", tags: ["external"]);
+               .AddCheck<CachedFactApiHealthCheck>("catfact-api", tags: ["external"]);
 
             services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
 

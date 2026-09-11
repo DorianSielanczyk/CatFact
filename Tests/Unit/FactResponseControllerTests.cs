@@ -18,7 +18,7 @@ public class FactResponseControllerTests
     }
 
     [Fact]
-    public async Task GetFactResponse_ReturnsOk_WhenServiceSucceeds()
+    public async Task SaveFactResponse_ReturnsOk_WhenServiceSucceeds()
     {
         // Arrange
         var expectedResponse = new FactResponse { Fact = "Cats can see in the dark", Length = 24 };
@@ -26,7 +26,7 @@ public class FactResponseControllerTests
                     .ReturnsAsync(expectedResponse);
 
         // Act
-        var result = await _controller.GetFactResponse(CancellationToken.None);
+        var result = await _controller.SaveFactResponse(CancellationToken.None);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -35,7 +35,7 @@ public class FactResponseControllerTests
     }
 
     [Fact]
-    public async Task GetFactResponse_ThrowsOperationCanceledException_WhenRequestCanceled()
+    public async Task SaveFactResponse_ThrowsOperationCanceledException_WhenRequestCanceled()
     {
         // Arrange
         var cts = new CancellationTokenSource();
@@ -46,6 +46,6 @@ public class FactResponseControllerTests
 
         // Act & Assert
         await Assert.ThrowsAsync<OperationCanceledException>(() =>
-            _controller.GetFactResponse(cts.Token));
+            _controller.SaveFactResponse(cts.Token));
     }
 }

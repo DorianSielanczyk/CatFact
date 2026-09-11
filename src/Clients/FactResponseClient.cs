@@ -1,6 +1,6 @@
-﻿using CatFact.API.DTOs;
+using CatFact.API.DTOs;
 
-namespace CatFact.API.Client
+namespace CatFact.API.Clients
 {
     public class FactResponseClient(HttpClient httpClient) : IFactResponseClient
     {

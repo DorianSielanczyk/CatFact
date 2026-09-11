@@ -3,7 +3,7 @@ using System.Text.Json;
 using Moq;
 using Moq.Protected;
 using Xunit;
-using CatFact.API.Client;
+using CatFact.API.Clients;
 using CatFact.API.DTOs;
 
 namespace CatFact.Tests.Unit;

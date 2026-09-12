@@ -3,7 +3,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace CatFact.API.HealthChecks
 {
-    public class FactApiHealthCheck(IFactResponseClient factClient) : IHealthCheck
+    public class FactApiHealthCheck(IFactResponseClient factClient) : IHealthCheck, IFactApiHealthCheck
     {
         public async Task<HealthCheckResult> CheckHealthAsync(
             HealthCheckContext context,

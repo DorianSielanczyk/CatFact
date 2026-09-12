@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace CatFact.API.Infrastructure
 {
-    public class FileWriteLockManager : IDisposable
+    public class FileWriteLockManager : IDisposable, IFileWriteLockManager
     {
         public SemaphoreSlim Lock { get; }
 

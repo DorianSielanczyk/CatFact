@@ -16,7 +16,7 @@ public class FactResponseServiceTests : IDisposable
     private readonly string _testFileName = "test_fact.txt";
     private readonly Mock<IFactResponseClient> _mockClient = new();
     private readonly Mock<IWebHostEnvironment> _mockEnvironment = new();
-    private readonly Mock<FileWriteLockManager> _mockLockManager = new();
+    private readonly Mock<IFileWriteLockManager> _mockLockManager = new();
     private readonly FactResponseService _service;
     private readonly string _expectedDirPath;
 
@@ -31,7 +31,7 @@ public class FactResponseServiceTests : IDisposable
         _mockEnvironment.Setup(e => e.ContentRootPath)
             .Returns(Directory.GetParent(Directory.GetCurrentDirectory())!.FullName);
 
-        _service = new FactResponseService(_mockClient.Object, options, _mockEnvironment.Object, _mockLockManager.Object);
+        _service = new FactResponseService(_mockClient.Object, options, _mockEnvironment.Object, _mockLockManager.Object as FileWriteLockManager);
         _expectedDirPath = Path.Combine(_mockEnvironment.Object.ContentRootPath, _testDirectoryName);
     }
 
@@ -80,7 +80,7 @@ public class FactResponseServiceTests : IDisposable
             FileName = "test.txt"
         });
 
-        var serviceWithBadConfig = new FactResponseService(_mockClient.Object, badOptions, _mockEnvironment.Object, _mockLockManager.Object);
+        var serviceWithBadConfig = new FactResponseService(_mockClient.Object, badOptions, _mockEnvironment.Object, _mockLockManager.Object as FileWriteLockManager);
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<Exception>(() => serviceWithBadConfig.SaveToFileFactResponseAsync());

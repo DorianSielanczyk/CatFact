@@ -5,7 +5,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace CatFact.API.HealthChecks
 {
     public class CachedFactApiHealthCheck(
-        FactApiHealthCheck innerCheck,
+        IFactApiHealthCheck innerCheck,
         IMemoryCache memoryCache) : IHealthCheck
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(30);

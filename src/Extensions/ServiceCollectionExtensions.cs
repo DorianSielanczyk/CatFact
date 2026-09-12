@@ -35,6 +35,8 @@ namespace CatFact.API.Extensions
             services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
 
             services.AddScoped<IFactResponseService, FactResponseService>();
+            services.AddTransient<IFactApiHealthCheck, FactApiHealthCheck>();
+            services.AddSingleton<IFileWriteLockManager, FileWriteLockManager>();
 
             return services;
         }

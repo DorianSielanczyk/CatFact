@@ -10,7 +10,7 @@ namespace CatFact.API.Services
         IFactResponseClient factResponseClient,
         IOptions<FileStorageOptions> fileStorageOptions,
         IWebHostEnvironment environment,
-        FileWriteLockManager lockManager) : IFactResponseService 
+        IFileWriteLockManager lockManager) : IFactResponseService 
     {
 
         public async Task<FactResponse> SaveToFileFactResponseAsync(CancellationToken cancellationToken = default)

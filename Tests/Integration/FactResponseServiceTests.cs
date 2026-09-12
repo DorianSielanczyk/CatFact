@@ -31,7 +31,10 @@ public class FactResponseServiceTests : IDisposable
         _mockEnvironment.Setup(e => e.ContentRootPath)
             .Returns(Directory.GetParent(Directory.GetCurrentDirectory())!.FullName);
 
-        _service = new FactResponseService(_mockClient.Object, options, _mockEnvironment.Object, _mockLockManager.Object as FileWriteLockManager);
+        _mockLockManager.SetupGet(x => x.Lock)
+            .Returns(new SemaphoreSlim(1, 1));
+
+        _service = new FactResponseService(_mockClient.Object, options, _mockEnvironment.Object, _mockLockManager.Object);
         _expectedDirPath = Path.Combine(_mockEnvironment.Object.ContentRootPath, _testDirectoryName);
     }
 
@@ -80,7 +83,7 @@ public class FactResponseServiceTests : IDisposable
             FileName = "test.txt"
         });
 
-        var serviceWithBadConfig = new FactResponseService(_mockClient.Object, badOptions, _mockEnvironment.Object, _mockLockManager.Object as FileWriteLockManager);
+        var serviceWithBadConfig = new FactResponseService(_mockClient.Object, badOptions, _mockEnvironment.Object, _mockLockManager.Object);
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<Exception>(() => serviceWithBadConfig.SaveToFileFactResponseAsync());
@@ -91,10 +94,10 @@ public class FactResponseServiceTests : IDisposable
     {
         // Arrange
         var cts = new CancellationTokenSource();
+        cts.Cancel();
 
         _mockClient.Setup(c => c.GetFactResponseAsync(It.IsAny<CancellationToken>()))
-                   .ReturnsAsync(new FactResponse { Fact = "Cats", Length = 4 })
-                   .Callback(() => cts.Cancel());
+                   .ReturnsAsync(new FactResponse { Fact = "Cats", Length = 4 });
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
